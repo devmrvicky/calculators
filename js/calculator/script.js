@@ -20,6 +20,15 @@ let expressionArr = [];
 let prevExpressionArr = [];
 let prevCalculations = [];
 
+const getPreviousCalculation = () => {
+  let prevCalcFromStorage = JSON.parse(localStorage.getItem("calculations"));
+  if (!prevCalcFromStorage) {
+    prevCalcFromStorage = [];
+  }
+  prevCalculations = prevCalcFromStorage;
+};
+getPreviousCalculation();
+
 // click effect for buttons
 const applyClickEffect = (btn) => {
   btn.classList.add("click-effect");
@@ -77,11 +86,14 @@ const deleteIndividualCalculation = ({ id }) => {
     (calculation) => calculation.id !== id
   );
   prevCalculations = newPreCalculations;
+  localStorage.setItem("calculations", JSON.stringify(prevCalculations));
   showPrevCalculationsOnHisTab();
 };
 
 const prevCalculationsElem = historyTab.querySelector(".prev-calculations");
+showPrevCalculationsOnHisTab();
 function showPrevCalculationsOnHisTab() {
+  getPreviousCalculation();
   prevCalculationsElem.innerHTML = "";
   for (let calculation of prevCalculations.reverse()) {
     const prevCalculation = getPreviousCalcElem(calculation);
@@ -146,17 +158,19 @@ const updatePrevCalculation = (expression, result) => {
   obj.expression = expression;
   obj.result = result;
   prevCalculations.push(obj);
+  localStorage.setItem("calculations", JSON.stringify(prevCalculations));
   showPrevCalculationsOnHisTab();
 };
 
 // clear all previous calculations
 const clearAllHistory = () => {
   prevCalculations = [];
-  showPrevCalculationsOnHisTab();
+  localStorage.setItem("calculations", JSON.stringify(prevCalculations));
   prevCalculationsElem.innerHTML = `
   <li class="flex">
-    <p class="his-message">There's no history yet.</p>
+  <p class="his-message">There's no history yet.</p>
   </li>`;
+  showPrevCalculationsOnHisTab();
   setTimeout(() => {
     toggleHistoryTab();
   }, 500);
